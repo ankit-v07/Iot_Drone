@@ -1,0 +1,78 @@
+import serial
+import time
+import cv2
+import RPi.GPIO as gpio
+import sys
+
+ser = serial.Serial ("/dev/ttyS0", 9600) #Open port with baud rate
+def init():
+
+gpio.setmode(gpio.BCM)
+gpio.setup(19,gpio.OUT)
+gpio.setup(16,gpio.OUT)
+gpio.setup(26,gpio.OUT)
+gpio.setup(20,gpio.OUT)
+
+def forward(tf):
+gpio.output(16,gpio.LOW)
+gpio.output(20,gpio.HIGH)
+
+
+gpio.output(26,gpio.HIGH)
+gpio.output(19,gpio.LOW)
+time.sleep(tf)
+gpio.cleanup()
+
+def right(tf):
+gpio.output(20,gpio.HIGH)
+gpio.output(16,gpio.LOW)
+gpio.output(26,gpio.LOW)
+gpio.output(19,gpio.HIGH)
+time.sleep(tf)
+gpio.cleanup()
+
+def left(tf):
+gpio.output(20,gpio.LOW)
+gpio.output(16,gpio.HIGH)
+gpio.output(26,gpio.HIGH)
+gpio.output(19,gpio.LOW)
+time.sleep(tf)
+
+
+gpio.cleanup()
+
+def reverse(tf):
+gpio.output(16,gpio.HIGH)
+gpio.output(20,gpio.LOW)
+gpio.output(26,gpio.LOW)
+gpio.output(19,gpio.HIGH)
+time.sleep(tf)
+gpio.cleanup()
+
+def stop(tf):
+gpio.output(16,gpio.LOW)
+gpio.output(20,gpio.LOW)
+gpio.output(26,gpio.LOW)
+gpio.output(19,gpio.LOW)
+while True:
+
+received_data = ser.read() #read serial port
+sleep_time=0.03
+#data_left = ser.inWaiting() #check for remaining byte
+
+
+#received_data += ser.read(data_left)
+if received_data=='w':
+init()
+forward(sleep_time)
+elif received_data=='s':
+init()
+reverse(sleep_time)
+elif received_data=='a':
+init()
+left(sleep_time)
+elif received_data=='d':
+init()
+right(sleep_time)
+print (received_data) #print received data
+ser.write(received_data) #transmit data serially
